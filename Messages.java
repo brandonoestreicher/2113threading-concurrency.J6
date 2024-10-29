@@ -7,7 +7,7 @@ public class Messages {
 
     public Messages() {
       morning = "Good morning!";
-      afternoon = "Good afternnon!";
+      afternoon = "Good afternoon!";
       evening = "Good evening!";
       night = "Good night!";
     }
