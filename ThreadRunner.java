@@ -1,7 +1,7 @@
 /* ThreadRunner.java */
 public class ThreadRunner {
 
-    private static boolean statusFlag = false;
+    private static volatile boolean statusFlag = false;
 
     private static class SimpleThreadOne extends Thread {
         public void run() {
