@@ -21,3 +21,169 @@ This join statement affects the output of the program by only allowing the threa
 
 ### Question 6
 `isAlive()`, when called on a thread, returns a truth value that corresponds to whether or not the thread it was called on is still running. `join()` makes the thread ***in*** which it was called to wait to continue execution until the thread ***on*** which it was called finishes execution.
+
+### Question 7
+This code outputs print statements from three different threads, each representing a different animal running in a race. The threads are set to sleep for a time equal to 1000/(*animal's given speed value*) before they print out a lap statement so that each `AnimalRacerThread` prints out its lap statements at a realistic time interval given the animal that it represents, and so that each `AnimalRacerThread` finishes at an appropritate and realistic time (before or after the other two), given the animal that it represents.
+
+**Here is the output:**
+```
+On your marks, get set, go!
+Cheetah lap 1
+Hare lap 1
+Tortoise lap 1
+Cheetah lap 2
+Cheetah lap 3
+Hare lap 2
+Cheetah lap 4
+Cheetah lap 5
+Hare lap 3
+Cheetah lap 6
+Cheetah lap 7
+Hare lap 4
+Cheetah lap 8
+Tortoise lap 2
+CheetahFinished!
+Hare lap 5
+Hare lap 6
+Hare lap 7
+Hare lap 8
+Tortoise lap 3
+HareFinished!
+Tortoise lap 4
+Tortoise lap 5
+Tortoise lap 6
+Tortoise lap 7
+Tortoise lap 8
+TortoiseFinished!
+```
+
+### Question 8
+**Modified code:**
+```java
+/* AnimalFootRace.java */
+public class AnimalFootRace {
+    public static void main(String[] args) {
+        Thread tortoiseThread = new AnimalRacerThread("Tortoise", 5);
+        Thread hareThread = new AnimalRacerThread("Hare", 20);
+        Thread cheetahThread = new AnimalRacerThread("Cheetah", 50);
+
+        System.out.println("On your marks, get set, go!");
+        hareThread.start();
+        try {
+            hareThread.join();
+        } catch (InterruptedException e) {
+            System.out.println("Interrupted while joining");
+        }
+        tortoiseThread.start();
+        cheetahThread.start();
+    }
+}
+```
+**Output after modification:**
+```
+On your marks, get set, go!
+Hare lap 1
+Hare lap 2
+Hare lap 3
+Hare lap 4
+Hare lap 5
+Hare lap 6
+Hare lap 7
+Hare lap 8
+HareFinished!
+Tortoise lap 1
+Cheetah lap 1
+Cheetah lap 2
+Cheetah lap 3
+Cheetah lap 4
+Cheetah lap 5
+Cheetah lap 6
+Cheetah lap 7
+Cheetah lap 8
+CheetahFinished!
+Tortoise lap 2
+Tortoise lap 3
+Tortoise lap 4
+Tortoise lap 5
+Tortoise lap 6
+Tortoise lap 7
+Tortoise lap 8
+TortoiseFinished!
+```
+To give the hare a head start, I first started its thread before the `tortoiseThead`, and then also before the `tortoiseThread` and `cheetahThread` got a chance to start, I added a `join()` call to the `hareThread` so that the main thread would have to wait for the `hareThread` to finish before allowing the `tortoiseThread` and `cheetahThread` to start. As you can see, this modification was successful.
+
+### Question 9
+**Modified code:**
+```java
+/* AnimalFootRace.java */
+public class AnimalFootRace {
+    public static void main(String[] args) {
+        Thread tortoiseThread = new AnimalRacerThread("Tortoise", 5);
+        Thread hareThread = new AnimalRacerThread("Hare", 20);
+        Thread humanThread = new AnimalRacerThread("Human", 35);
+        Thread cheetahThread = new AnimalRacerThread("Cheetah", 50);
+
+        System.out.println("On your marks, get set, go!");
+        tortoiseThread.start();
+        hareThread.start();
+        humanThread.start();
+        cheetahThread.start();
+    }
+}
+```
+**Output:**
+```
+On your marks, get set, go!
+Human lap 1
+Tortoise lap 1
+Hare lap 1
+Cheetah lap 1
+Cheetah lap 2
+Human lap 2
+Cheetah lap 3
+Hare lap 2
+Human lap 3
+Cheetah lap 4
+Human lap 4
+Cheetah lap 5
+Hare lap 3
+Cheetah lap 6
+Human lap 5
+Cheetah lap 7
+Human lap 6
+Hare lap 4
+Cheetah lap 8
+Human lap 7
+Tortoise lap 2
+CheetahFinished!
+Hare lap 5
+Human lap 8
+HumanFinished!
+Hare lap 6
+Hare lap 7
+Hare lap 8
+Tortoise lap 3
+HareFinished!
+Tortoise lap 4
+Tortoise lap 5
+Tortoise lap 6
+Tortoise lap 7
+Tortoise lap 8
+TortoiseFinished!
+```
+I modified the program by adding a `humanThread` to the race. The `humanThread`'s `animalSpeed` = `35`, which is faster than that of `hareThread` and slower than that of `cheetahThread`, in accordance with real life (although the actual speeds themselves are obviously not). The output appropriatetly reflects the fact that a human should run and finish a race faster than a hare but slower than a cheetah.
+
+### Question 10
+In this implementation, *yes*, it *is* possible for more than one instance of the `Singleton` class to be created if two threads call the `getSingletonInstance()` method at the same time. This is beause it's up to the compiler to decide the order in which threads take turns executing, and if execution "right-of-way" switches line-by-line at the if statement, it's possible that both threads enter the if statement one after another since the first one didn't get to instantiate the `Singleton` class before the other thread entered the if statement. Thus, we'd end up with two instances of `Singleton`.
+
+### Question 11
+In this implementation, it's not possibe to have more than one instance of the `Singleton` class. This is because the addition of the `synchronized` keyword in the method signature of `getSingletonInstance()` makes the implementation thread-safe, i.e. it makes it so that if one thread is currently inside of the `getSingletonInstance()` body, another thread that also wants to get inside that method has to wait until the thread that entered it first leaves it. So, the first thread that enters the method will enter the if statement, instantiate `Singleton`, and leave the class, regardless of whether or not other threads are trying to access the body of `getSingletonInstance()` as well. After the first thread leaves `getSingletonInstance()` and the instance has been created, only then does it become possible for other threads to enter the method. If they do enter the method, they will not be able to reach the inside of the if statement an instantiate `Singleton` again because `singletonInstance` ≠ `null`.
+
+### Question 12
+This code outputs print statements `Simple thread one counter - 1` all the way to `Simple thread one counter - 2000` via a for loop in `simpleThreadOne`. Then, it outputs `Status flag changed to true in simple thread one.` Then, the program hangs because it's in a seemingly infinite while loop in `simpleThreadTwo`. It gets stuck in the while loop because the flag isn't getting updated in `simpleThreadTwo` a reasonable time after (or maybe even ever) after it's changed in `simpleThreadOne`. Instead, `waitCounter` is just increasing for a period of time that is essentially forever.
+
+### Question 13
+This code has the same output as in the previous question, but instead of hanging at the end, it prints out `Start simple thread two processing` followed by the value `waitCounter` accrued while waiting for `statusFlag` to be changed to `true`. It finishes running because we added the `volatile` keyword to the delclaration of `statusFlag`. The `volatile` keyword means that any time a variable that was declared with the `volatile` keyword is updated, it immeadiately gets updated in every other active thread in which it appears. This way, once we switch `statusFlag` to `true` in `simpleThreadOne`, it "immediately" gets updated in `simpleThreadTwo`, and as such, execution can successfully move past the while loop and print out the statement at the end of `simpleThreadTwo` rather than hanging and waiting for `statusFlag` to be updated "forever".
+
+### Question 14
+A race condition may occur in `makeBid` if two threads call it at the same time, so making it `synchronized` will fix this problem as one thread will have to wait for another thread currently interacting with `makeBid` before it can then interact with it. We want to make sure that each `Bidder` thread places its bid before another one tries to place a bid, otherwise things will probably get messy. Declaring `makeBid` as `synchronized` ensures that `Bidder`s must wait for the `Bidder` placing their bid to finish placing their bid before the next `Bidder` can proceed placing its bid.
