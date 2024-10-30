@@ -6,8 +6,13 @@ public class AnimalFootRace {
         Thread cheetahThread = new AnimalRacerThread("Cheetah", 50);
 
         System.out.println("On your marks, get set, go!");
-        tortoiseThread.start();
         hareThread.start();
+        try {
+            hareThread.join();
+        } catch (InterruptedException e) {
+            System.out.println("Interrupted while joining");
+        }
+        tortoiseThread.start();
         cheetahThread.start();
     }
 }
